@@ -1,0 +1,8 @@
+pubspec.lock
+
+coverage/
+coverage.lcov
+
+.dart_tool/
+coverage/
+*.iml
