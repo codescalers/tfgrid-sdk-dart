@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1.6.0
+        with:
+            sdk: 'stable'
+      - name: Install Melos
+        run: dart pub global activate melos      
+                
+      - name: Install dependencies
+        run: dart pub global run melos bootstrap
+
+      - name: Linting
+        run: dart analyze .
+

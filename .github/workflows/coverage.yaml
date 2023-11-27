@@ -1,0 +1,50 @@
+name: Upload Coverage
+
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Repository
+        uses: actions/checkout@v2
+
+      - name: List Files
+        run: ls -R
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1.6.0
+        with:
+          sdk: "stable"
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.16.0"
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Install dependencies
+        run: melos bootstrap
+
+      - name: Run unit tests
+        run: melos run unit_test
+
+      - name: Create coverage directory
+        run: mkdir -p coverage
+
+      - name: Merge coverage
+        run: |
+          melos exec rm -rf coverage
+          melos run unit_test
+          melos exec --dir-exists="coverage" -- bash -c 'dart pub global run coverde filter --input coverage/lcov.info --output coverage/filtered.lcov.info --filters .g.dart'
+          melos exec --dir-exists="coverage" -- bash -c 'dart pub global run coverde value -i coverage/filtered.lcov.info > coverage/result.txt'
+ 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

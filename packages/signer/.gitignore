@@ -6,3 +6,5 @@ coverage.lcov
 
 .dart_tool
 *.iml
+
+build/
