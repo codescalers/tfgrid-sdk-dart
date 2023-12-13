@@ -52,4 +52,11 @@ class Signer {
       throw Exception("Failed to verify signature. Error: $e");
     }
   }
+
+  Future<KeyPair> keypairFromAddress(String address) async {
+    final keyring = Keyring();
+    keyring.add(_keypair!);
+    final pair = keyring.getByAddress(address);
+    return pair;
+  }
 }

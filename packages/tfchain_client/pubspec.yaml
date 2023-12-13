@@ -1,0 +1,27 @@
+name: tfchain_client
+description: A sample command-line application.
+version: 1.0.0
+
+environment:
+  sdk: ^3.2.0
+
+dependencies:
+  polkadart: ^0.2.2
+  polkadart_keyring: ^0.2.1
+  substrate_bip39: ^0.2.0
+  polkadart_cli: ^0.2.2
+  hex: ^0.2.0
+  bip39: ^1.0.6
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
+  coverage: ^1.7.1
+
+polkadart:
+  output_dir: lib/generated
+  chains:
+    dev: wss://tfchain.dev.grid.tf/ws
+    # qa: wss://tfchain.qa.grid.tf/ws
+    # test: wss://tfchain.test.grid.tf/ws
+    # main: wss://tfchain.grid.tf/ws

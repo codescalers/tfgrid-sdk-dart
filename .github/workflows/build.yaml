@@ -16,13 +16,14 @@ jobs:
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@v1.6.0
         with:
-            sdk: 'stable'
+          sdk: 'stable'
       - name: Install Melos
-        run: dart pub global activate melos      
-                
+        run: dart pub global activate melos
+
       - name: Install dependencies
         run: dart pub global run melos bootstrap
 
       - name: Linting
-        run: dart analyze .
+        run: find . -name "*.dart" -not -path "./packages/tfchain_client/lib/generated/*" | xargs dart analyze
+
 

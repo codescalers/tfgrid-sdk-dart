@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:polkadart_keyring/polkadart_keyring.dart';
 import 'package:signer/signer.dart';
 import 'package:test/test.dart';
 
@@ -145,6 +146,21 @@ void main() {
       final differentData = 'differentData';
       final isVerified = await signer.verify(signature, differentData);
       expect(isVerified, isFalse);
+    });
+
+    test('Keypair from address', () async {
+      final signer = Signer();
+      final mnemonic =
+          'picnic flip cigar rival risk scatter slide aware trust garlic solution token';
+      await signer.fromMnemonic(mnemonic);
+
+      final keypair = await KeyPair.fromMnemonic(mnemonic);
+      final address = keypair.address;
+
+      final pair = await signer.keypairFromAddress(address);
+
+      expect(pair, isNotNull);
+      expect(pair.address, equals(address));
     });
   });
 }

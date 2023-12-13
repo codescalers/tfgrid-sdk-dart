@@ -12,3 +12,8 @@ dev_dependencies:
 dependencies:
   coverage: ^1.7.1
   melos: ^3.2.0
+  signer: 
+    path: ./packages/signer
+  tfchain_client:
+    path: ./packages/tfchain_client 
+
