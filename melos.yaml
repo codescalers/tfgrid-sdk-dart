@@ -1,6 +1,8 @@
 name: tfgrid_sdk_dart_monorepo
 packages:
   - packages/**
+  - ./packages/signer
+  - ./packages/tfchain_client
 
 scripts:
   analyze:

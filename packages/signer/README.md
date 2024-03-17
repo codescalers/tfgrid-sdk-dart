@@ -65,7 +65,7 @@ dart pub get
 To run the tests, run the following command 
 
 ```bash
-dart test
+dart test .
 ```
 
 ## Generate Coverage

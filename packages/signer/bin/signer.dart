@@ -7,7 +7,7 @@ void main() async {
   final mnemonic =
       'picnic flip cigar rival risk scatter slide aware trust garlic solution token';
   final signer = Signer();
-  await signer.fromMnemonic(mnemonic);
+  await signer.fromMnemonic(mnemonic, KPType.ed25519);
   final data = "anydata123";
   final signatureFromMnemonic = await signer.sign(data);
 
@@ -49,14 +49,14 @@ void main() async {
   ]);
 
   final signer2 = Signer();
-  await signer2.fromSeed(seedUint8List);
+  await signer2.fromSeed(seedUint8List, KPType.ed25519);
   final signatureFromSeed = await signer2.sign(data);
   print("Signature from Seed: $signatureFromSeed");
 
   final signer3 = Signer();
-  await signer3.fromHexSeed(
-      '0x6c1d94caa7bf0a0d7ef0983c1823e9ac6abed57221d57d0922654352d85cb1e4');
+  signer3.fromHexSeed(
+      '0x6c1d94caa7bf0a0d7ef0983c1823e9ac6abed57221d57d0922654352d85cb1e4',
+      KPType.ed25519);
   final signatureFromSeed2 = await signer3.sign(data);
   print("Signature from Hex Seed: $signatureFromSeed2");
-
 }

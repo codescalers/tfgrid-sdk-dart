@@ -1,55 +1,94 @@
 part of '../signer.dart';
+// TODO: should return keypair or not ?
+
 
 class Signer {
-  KeyPair? _keypair;
+  KeyPair? keypair;
+  KPType? _type;
 
-  Future<void> fromMnemonic(String mnemonic) async {
+  Future<KeyPair?> fromMnemonic(String mnemonic, KPType type) async {
     try {
-      _keypair = await KeyPair.fromMnemonic(mnemonic);
+      if (type.value == KPType.sr25519.value) {
+        keypair = await KeyPair.sr25519.fromMnemonic(mnemonic);
+        _type = KPType.sr25519;
+        return keypair;
+      } else if (type.value == KPType.ed25519.value) {
+        keypair = await KeyPair.ed25519.fromMnemonic(mnemonic);
+        _type = KPType.ed25519;
+        return keypair;
+      } else {
+        throw Exception("Wrong KeyPair type !");
+      }
     } catch (e) {
       throw Exception("Failed to create keyPair from mnemonic. Error: $e");
     }
   }
 
-  Future<void> fromSeed(Uint8List seed) async {
+  Future<KeyPair?> fromSeed(Uint8List seed, KPType type) async {
     try {
-      _keypair = KeyPair.fromSeed(seed);
+      if (type.value == KPType.sr25519.value) {
+        keypair = await KeyPair.sr25519.fromSeed(seed);
+        _type = KPType.sr25519;
+        return keypair;
+      } else if (type.value == KPType.ed25519.value) {
+        keypair = await KeyPair.ed25519.fromSeed(seed);
+        _type = KPType.ed25519;
+        return keypair;
+      } else {
+        throw Exception("Wrong KeyPair type !");
+      }
     } catch (e) {
       throw Exception("Failed to create keyPair from seed. Error: $e");
     }
   }
 
-  Future<void> fromHexSeed(String hexSeed) async {
+  void fromHexSeed(String hexSeed, KPType type) {
     try {
       final seed = HEX.decode(hexSeed.replaceAll('0x', ''));
-      _keypair = KeyPair.fromSeed(Uint8List.fromList(seed));
+      if (type.value == KPType.sr25519.value) {
+        keypair = KeyPair.sr25519.fromSeed(Uint8List.fromList(seed));
+        _type = KPType.sr25519;
+      } else if (type.value == KPType.ed25519.value) {
+        keypair = KeyPair.ed25519.fromSeed(Uint8List.fromList(seed));
+        _type = KPType.ed25519;
+      } else {
+        throw Exception("Wrong KeyPair type !");
+      }
     } catch (e) {
       throw Exception("Failed to create keyPair from hex seed. Error: $e");
     }
   }
 
-  Future<Uint8List> sign(String data) async {
-    if (_keypair == null) {
+  Uint8List sign(String data) {
+    if (keypair == null) {
       throw Exception("keypair not initialized.");
     }
     try {
       final dataBytes = Uint8List.fromList(utf8.encode(data));
-      final signature = _keypair!.sign(dataBytes);
+      final signature = keypair!.sign(dataBytes);
       return signature;
     } catch (e) {
       throw Exception("Failed to sign data. Error: $e");
     }
   }
 
-  Future<bool> verify(Uint8List signature, String data) async {
-    if (_keypair == null) {
+  bool verify(Uint8List signature, String data) {
+    if (keypair == null) {
       throw Exception("keypair not initialized.");
     }
     try {
       final dataBytes = Uint8List.fromList(utf8.encode(data));
-      return _keypair!.verify(dataBytes, signature);
+      return keypair!.verify(dataBytes, signature);
     } catch (e) {
       throw Exception("Failed to verify signature. Error: $e");
     }
+  }
+
+  KeyPair keypairFromAddress(String address) {
+    final keyring = Keyring();
+
+    keyring.add(keypair!);
+    final pair = keyring.getByAddress(address);
+    return pair;
   }
 }
