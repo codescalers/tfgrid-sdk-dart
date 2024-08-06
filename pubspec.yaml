@@ -11,7 +11,7 @@ dev_dependencies:
 
 dependencies:
   coverage: ^1.7.1
-  melos: ^4.1.0
+  melos: ">=4.1.0 <7.0.0"
   signer: 
     git:
       url: https://github.com/codescalers/tfgrid-sdk-dart.git
