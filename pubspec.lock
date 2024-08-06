@@ -630,10 +630,10 @@ packages:
     description:
       path: "packages/signer"
       ref: main
-      resolved-ref: "3663a356a722c082aa0b68d5405f42b3885beedb"
+      resolved-ref: "9a932bd23dd44eeb385bfed7fb75600c154434c2"
       url: "https://github.com/codescalers/tfgrid-sdk-dart.git"
     source: git
-    version: "1.0.0"
+    version: "0.1.0"
   source_map_stack_trace:
     dependency: transitive
     description:

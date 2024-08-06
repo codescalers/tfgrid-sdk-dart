@@ -17,6 +17,7 @@ dependencies:
       url: https://github.com/codescalers/tfgrid-sdk-dart.git
       ref: main
       path: packages/signer
+    version: any
   substrate_bip39: ^0.4.0
   tfchain_client:
     path: ./packages/tfchain_client 
