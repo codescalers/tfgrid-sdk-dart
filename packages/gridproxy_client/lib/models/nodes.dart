@@ -250,21 +250,7 @@ class Dmi {
   });
 
   factory Dmi.fromJson(Map<String, dynamic> json) {
-    return Dmi(
-      baseboard: json['baseboard'] != null
-          ? Baseboard.fromJson(json['baseboard'])
-          : null,
-      bios: json['bios'] != null ? Bios.fromJson(json['bios']) : null,
-      memory: json['memory'] != null
-          ? (json['memory'] as List).map((i) => Memory.fromJson(i)).toList()
-          : [],
-      node_twin_id: json['node_twin_id'] ?? 0,
-      processor: json['processor'] != null
-          ? (json['processor'] as List)
-              .map((i) => Processor.fromJson(i))
-              .toList()
-          : [],
-    );
+    return fromJson(json);
   }
 
   Map<String, dynamic> toJson() {
@@ -557,13 +543,7 @@ class NodeStatistics {
   });
 
   factory NodeStatistics.fromJson(Map<String, dynamic> json) {
-    return NodeStatistics(
-      system:
-          json['system'] != null ? Resources.fromJson(json['system']) : null,
-      total: json['total'] != null ? Resources.fromJson(json['total']) : null,
-      used: json['used'] != null ? Resources.fromJson(json['used']) : null,
-      users: json['users'] != null ? NodeUsers.fromJson(json['users']) : null,
-    );
+    return fromJson(json);
   }
 
   Map<String, dynamic> toJson() {

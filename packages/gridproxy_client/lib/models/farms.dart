@@ -92,20 +92,21 @@ class Farm {
   });
 
   factory Farm.fromJson(Map<String, dynamic> json) {
-    return Farm(
-      certificationType: json['certificationType'],
-      dedicated: json['dedicated'],
-      farmID: json['farmId'],
-      name: json['name'],
-      pricingPolicyId: json['pricingPolicyId'],
-      publicIps: json['publicIps'] != null
-          ? (json['publicIps'] as List)
-              .map((i) => PublicIp.fromJson(i))
-              .toList()
-          : <PublicIp>[],
-      stellarAddress: json['stellarAddress'],
-      twinId: json['twinId'],
-    );
+    return fromJson(json);
+    // return Farm(
+    //   certificationType: json['certificationType'],
+    //   dedicated: json['dedicated'],
+    //   farmID: json['farmId'],
+    //   name: json['name'],
+    //   pricingPolicyId: json['pricingPolicyId'],
+    //   publicIps: json['publicIps'] != null
+    //       ? (json['publicIps'] as List)
+    //           .map((i) => PublicIp.fromJson(i))
+    //           .toList()
+    //       : <PublicIp>[],
+    //   stellarAddress: json['stellarAddress'],
+    //   twinId: json['twinId'],
+    // );
   }
 
   Map<String, dynamic> toJson() {
