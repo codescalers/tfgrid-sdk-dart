@@ -22,7 +22,13 @@ class Client {
     return Client(network, keyPair.secretSeed);
   }
 
-  static Future<Client> createFromMnemonic(
+  factory Client.fromSecretSeedHex(NetworkType network, String secretSeedHex) {
+    final seed = Uint8List.fromList(hex.decode(secretSeedHex));
+    final keyPair = KeyPair.fromSecretSeedList(seed);
+    return Client(network, keyPair.secretSeed);
+  }
+
+  static Future<Client> fromMnemonic(
       NetworkType network, String mnemonic) async {
     Wallet wallet = await Wallet.from(mnemonic);
     final keyPair = await wallet.getKeyPair();
@@ -359,35 +365,38 @@ class Client {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getTransactions(
+  Future<List<OperationResponse>> getTransactions(
       {String? assetCodeFilter}) async {
     Page<OperationResponse> payments = await _sdk.payments
         .forAccount(accountId)
         .order(RequestBuilderOrder.DESC)
         .execute();
-    List<Map<String, dynamic>> transactionDetails = [];
+    List<OperationResponse> transactionDetails = [];
 
     if (payments.records != null && payments.records!.isNotEmpty) {
       for (OperationResponse response in payments.records!) {
         if (response is PaymentOperationResponse) {
+          final memoText = await this.getMemoText(response.links?.transaction?.toJson()["href"]);
           String assetCode = response.assetCode ?? 'XLM';
           if (assetCodeFilter == null || assetCode == assetCodeFilter) {
-            var details = _handlePaymentOperationResponse(response);
-            transactionDetails.add({'type': 'Payment', 'details': details});
+            final details = PaymentTransaction(
+              hash: response.transactionHash!,
+              from: response.from!.accountId,
+              to: response.to!.accountId,
+              asset: response.assetCode.toString(),
+              amount: response.amount!,
+              type: response.to!.accountId == this.accountId
+                  ? TransactionType.Receive
+                  : TransactionType.Payment,
+              status: response.transactionSuccessful!,
+              date: DateTime.parse(response.createdAt!).toLocal().toString(),
+              memo: memoText);
+            
+            transactionDetails.add(details);
           }
         } else if (response is CreateAccountOperationResponse) {
           if (assetCodeFilter == null) {
-            var details = _handleCreateAccountOperationResponse(response);
-            transactionDetails
-                .add({'type': 'CreateAccount', 'details': details});
-          }
-        } else if (response is PathPaymentStrictReceiveOperationResponse) {
-          String assetCode = response.assetCode ?? 'XLM';
-          if (assetCodeFilter == null || assetCode == assetCodeFilter) {
-            var details =
-                _handlePathPaymentStrictReceiveOperationResponse(response);
-            transactionDetails
-                .add({'type': 'PathPaymentStrictReceive', 'details': details});
+            transactionDetails.add(response);
           }
         } else {
           print("Unhandled operation type: ${response.runtimeType}");
@@ -397,38 +406,6 @@ class Client {
       print("No payment records found.");
     }
     return transactionDetails;
-  }
-
-  PathPaymentStrictReceiveOperationDetails
-      _handlePathPaymentStrictReceiveOperationResponse(
-          PathPaymentStrictReceiveOperationResponse response) {
-    return PathPaymentStrictReceiveOperationDetails(
-      from: response.from!,
-      to: response.to!,
-      sourceAmount: double.parse(response.sourceAmount!),
-      sourceAssetCode: response.sourceAssetCode ?? 'XLM',
-      destinationAmount: double.parse(response.amount!),
-      destinationAssetCode: response.assetCode!,
-    );
-  }
-
-  PaymentOperationDetails _handlePaymentOperationResponse(
-      PaymentOperationResponse response) {
-    return PaymentOperationDetails(
-      from: response.from!.accountId,
-      to: response.to!.accountId,
-      amount: double.parse(response.amount!),
-      assetCode: response.assetCode ?? 'XLM',
-      isSuccessful: response.transactionSuccessful!,
-    );
-  }
-
-  CreateAccountOperationDetails _handleCreateAccountOperationResponse(
-      CreateAccountOperationResponse response) {
-    return CreateAccountOperationDetails(
-      account: response.account!,
-      startingBalance: double.parse(response.startingBalance!),
-    );
   }
 
   Future<List<BalanceInfo>> getBalance() async {
@@ -478,6 +455,19 @@ class Client {
       }
     } catch (error) {
       throw Exception('Could not create vestingAccount due to $error');
+    }
+  }
+
+  Future<String> getMemoText(String url) async {
+    try {
+      final response = await http.get(
+          Uri.parse(url), headers: {'Content-Type': 'application/json'},
+      );
+      final body = jsonDecode(response.body);
+      final memoText = body['memo'] ?? "";
+      return memoText;
+    } catch (e) {
+      throw Exception("Couldn't get memo text due to ${e}");
     }
   }
 }

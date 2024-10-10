@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:convert/convert.dart';
 
 bool isValidSeed(String seed) {
-  final RegExp hexRegex = RegExp(r'0[xX][0-9a-fA-F]+');
+  final RegExp hexRegex = RegExp(r'(0[xX])?[0-9a-fA-F]+');
   return hexRegex.hasMatch(seed);
 }
 

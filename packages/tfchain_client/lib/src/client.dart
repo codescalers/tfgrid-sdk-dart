@@ -1,6 +1,7 @@
 part of '../tfchain_client.dart';
 
 class QueryClient {
+  static Map<String, dynamic> connections = {};
   final String url;
   late Provider? provider;
   late polkadot.Dev api;
@@ -69,8 +70,18 @@ class QueryClient {
 
   Future<void> connect() async {
     _checkInputs();
-    provider = Provider.fromUri(Uri.parse(url));
-    api = polkadot.Dev(provider!);
+    if (connections.containsKey(url)) {
+      provider = connections[url]["provider"];
+      api = connections[url]["api"];
+      if (!provider!.isConnected()) {
+        api.connect();
+      }
+    } else {
+      provider = Provider.fromUri(Uri.parse(url));
+      api = polkadot.Dev(provider!);
+      final map = {"provider": provider, "api": api};
+      connections[url] = map;
+    }
   }
 
   Future<void> disconnect() async {
@@ -84,7 +95,7 @@ class Client extends QueryClient {
   final String mnemonicOrSecretSeed;
   late String address;
   final String _keypairType;
-  late final KeyPair? keypair;
+  late KeyPair? keypair;
   KVStore? _kvStore;
   Signer.KPType? _type;
   TermsAndConditions? _termsAndConditions;
