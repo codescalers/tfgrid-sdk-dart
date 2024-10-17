@@ -12,6 +12,10 @@ class Client {
   String get secretSeed => _keyPair.secretSeed;
   Uint8List? get privateKey => _keyPair.privateKey;
 
+  var logger = Logger(
+    printer: PrettyPrinter(),
+  );
+
   Client(this._network, String secretSeed) {
     _keyPair = KeyPair.fromSecretSeed(secretSeed);
     _initialize();
@@ -70,8 +74,8 @@ class Client {
     if (transaction != null) {
       transaction.sign(_keyPair, _stellarNetwork);
       await _sdk.submitTransaction(transaction);
-      print("Account Activated Successfully.");
-      print("TFT Asset was added Successfully ");
+      logger.i("Account Activated Successfully.");
+      logger.i("TFT Asset was added Successfully ");
       return true;
     } else {
       throw Exception("Failed to retrieve activation transaction.");
@@ -109,13 +113,13 @@ class Client {
     try {
       bool funded = await FriendBot.fundTestAccount(accountId);
       if (funded) {
-        print("Account funded successfully");
+        logger.i("Account funded successfully");
       } else {
-        print("Failed to fund account");
+        logger.e("Failed to fund account");
       }
       return funded;
     } catch (error) {
-      print("Error while funding account: $error");
+      logger.e("Error while funding account: $error");
       return false;
     }
   }
@@ -143,15 +147,15 @@ class Client {
           await _sdk.submitTransaction(transaction);
 
       if (!response.success) {
-        print("Failed to add trustline for $currencyCode");
+        logger.e("Failed to add trustline for $currencyCode");
         return false;
       } else {
-        print("trustline for $currencyCode was added successfully");
+        logger.i("trustline for $currencyCode was added successfully");
         return true;
       }
     }
 
-    print("No trustlines were processed");
+    logger.i("No trustlines were processed");
     return false;
   }
 
@@ -169,10 +173,10 @@ class Client {
 
       transaction!.sign(_keyPair, _stellarNetwork);
       await _sdk.submitTransaction(transaction);
-      print("Transaction successful.");
+      logger.i("Transaction successful.");
       return true;
     } catch (error) {
-      print("Failed to send transaction: $error");
+      logger.e("Failed to send transaction: $error");
       return false;
     }
   }
@@ -194,7 +198,7 @@ class Client {
       await _sdk.submitTransaction(transaction);
       return true;
     } catch (error) {
-      print("Failed to create account $error");
+      logger.e("Failed to create account $error");
       return false;
     }
   }
@@ -232,10 +236,10 @@ class Client {
           await _sdk.submitTransaction(transaction);
 
       if (response2.success) {
-        print("Trustline for $asset_code added successfully.");
+        logger.i("Trustline for $asset_code added successfully.");
         return true;
       } else {
-        print("Failed to add trustline for $asset_code.");
+        logger.e("Failed to add trustline for $asset_code.");
         return false;
       }
     } catch (error) {
@@ -263,10 +267,10 @@ class Client {
 
       if (details != null) {
         TransactionData transactionData = TransactionData.fromJson(details);
-        print(transactionData);
+        logger.i(transactionData);
         return transactionData;
       } else {
-        print('Failed to details for asset: ');
+        logger.e('Failed to details for asset: ');
       }
 
       return null;
@@ -292,17 +296,17 @@ class Client {
       required String currency,
       String? memoText,
       required bool funded}) async {
-
     // check if I have enough balance
     final accountBalances = await this.getBalance();
-    accountBalances.firstWhere((b) => b.assetCode == currency && double.parse(b.balance) > double.parse(amount),
-      orElse: () {
-        if (accountBalances.contains(currency)) {
-          throw Exception('Balance is not enough.');
-        }
-          throw Exception('Balance with asset code ${currency} not found.');
+    accountBalances.firstWhere(
+        (b) =>
+            b.assetCode == currency &&
+            double.parse(b.balance) > double.parse(amount), orElse: () {
+      if (accountBalances.contains(currency)) {
+        throw Exception('Balance is not enough.');
       }
-    );
+      throw Exception('Balance with asset code ${currency} not found.');
+    });
     // check that receiver account exists
     final receiver = await _sdk.accounts.account(accountId);
     // check that asset exists
@@ -358,8 +362,8 @@ class Client {
 
     fundedTransaction!.sign(_keyPair, _stellarNetwork);
 
-    print('Sending to');
-    print(
+    logger.i('Sending to');
+    logger.i(
         '${_serviceUrls[_network.toString()]}/transactionfunding_service/fund_transaction');
 
     try {
@@ -371,7 +375,7 @@ class Client {
             {'transaction': fundedTransaction.toEnvelopeXdrBase64()}),
       );
 
-      print(response.body);
+      logger.i(response.body);
     } catch (error) {
       throw Exception('Something went wrong! $error');
     }
@@ -407,11 +411,11 @@ class Client {
             transactionDetails.add(details);
           }
         } else {
-          print("Unhandled operation type: ${response.runtimeType}");
+          logger.i("Unhandled operation type: ${response.runtimeType}");
         }
       }
     } else {
-      print("No payment records found.");
+      logger.i("No payment records found.");
     }
     return transactionDetails;
   }
@@ -448,7 +452,7 @@ class Client {
       final body = jsonDecode(response.body);
       if (body['vesting_accounts'] is List &&
           body['vesting_accounts'].isEmpty) {
-        print("no vesting account found");
+        logger.i("no vesting account found");
         return [];
       } else {
         List<VestingAccount> accountsList = [];

@@ -8,6 +8,7 @@ environment:
 # Add regular dependencies here.
 dependencies:
   http: 1.2.0
+  logger: ^2.4.0
   stellar_flutter_sdk: ^1.7.5
 
 dev_dependencies:
