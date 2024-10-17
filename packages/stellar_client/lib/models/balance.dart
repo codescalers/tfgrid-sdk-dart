@@ -11,7 +11,7 @@ class BalanceData implements BalanceInfo {
 
   BalanceData({required this.assetCode, required this.balance});
 
-   @override
+  @override
   String toString() {
     return 'BalanceData(assetCode: $assetCode, balance: $balance)';
   }

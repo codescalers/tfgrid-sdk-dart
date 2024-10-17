@@ -65,6 +65,5 @@ void main() {
       await setupManager.client.disconnect();
       expect(false, setupManager.client.provider!.isConnected());
     });
-
   });
 }

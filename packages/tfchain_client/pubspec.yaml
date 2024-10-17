@@ -33,3 +33,6 @@ polkadart:
     # qa: wss://tfchain.qa.grid.tf/ws
     # test: wss://tfchain.test.grid.tf/ws
     # main: wss://tfchain.grid.tf/ws
+
+scripts:
+  test: --coverage=coverage
