@@ -393,11 +393,11 @@ class Client {
           if (assetCodeFilter == null || assetCode == assetCodeFilter) {
             final details = PaymentTransaction(
                 hash: response.transactionHash!,
-                from: response.from!.accountId,
-                to: response.to!.accountId,
+                from: response.from!,
+                to: response.to!,
                 asset: response.assetCode.toString(),
                 amount: response.amount!,
-                type: response.to!.accountId == this.accountId
+                type: response.to! == this.accountId
                     ? TransactionType.Receive
                     : TransactionType.Payment,
                 status: response.transactionSuccessful!,
