@@ -718,10 +718,10 @@ packages:
     dependency: "direct main"
     description:
       name: substrate_bip39
-      sha256: "29548105e939d1fb213aba96686eb5c5aae472249fa12b8dda58b252d23f492c"
+      sha256: fa950b80b92b7fc96f13683033fe974cdfd3ee0d30d989f6b8f3fcbfe6021ac2
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.4.1"
   substrate_metadata:
     dependency: transitive
     description:
